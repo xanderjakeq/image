@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require("path");
 
 module.exports = {
   module: {
@@ -8,25 +8,25 @@ module.exports = {
         exclude: /node_modules/,
         use: [
           {
-            loader: 'babel-loader',
-            query: {
-              presets: [ '@babel/preset-env' ],
-            },
+            loader: "babel-loader",
+            options: {
+              presets: ["@babel/preset-env"]
+            }
           },
-          'eslint-loader'
+          "eslint-loader"
         ]
       },
       {
         test: /\.css$/,
         use: [
-          'style-loader',
-          'css-loader',
+          "style-loader",
+          "css-loader",
           {
-            loader: 'postcss-loader',
+            loader: "postcss-loader",
             options: {
               plugins: [
-                require('postcss-nested-ancestors'),
-                require('postcss-nested')
+                require("postcss-nested-ancestors"),
+                require("postcss-nested")
               ]
             }
           }
@@ -34,16 +34,20 @@ module.exports = {
       },
       {
         test: /\.svg$/,
-        loader: 'svg-inline-loader?removeSVGTagAttrs=false'
+        use: [
+          {
+            loader: "svg-inline-loader?removeSVGTagAttrs=false"
+          }
+        ]
       }
     ]
   },
   output: {
-    path: path.join(__dirname, '/dist'),
-    publicPath: '/',
+    path: path.resolve('./dist'),
     filename: 'bundle.js',
-    library: 'ImageTool',
-    libraryTarget: 'umd',
+    library: '__MODULE_DEFAULT_EXPORT__',
+    libraryTarget: 'window',
     libraryExport: 'default'
-  }
+  },
+
 };

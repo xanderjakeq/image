@@ -42,11 +42,11 @@
  */
 
 // eslint-disable-next-line
-import css from './index.css';
-import Ui from './ui';
-import Tunes from './tunes';
-import ToolboxIcon from './svg/toolbox.svg';
-import Uploader from './uploader';
+import css from "./index.css";
+import Ui from "./ui";
+import Tunes from "./tunes";
+import ToolboxIcon from "./svg/toolbox.svg";
+import Uploader from "./uploader";
 
 /**
  * @typedef {object} ImageConfig
@@ -94,7 +94,7 @@ export default class ImageTool {
   static get toolbox() {
     return {
       icon: ToolboxIcon,
-      title: 'Image',
+      title: "Image"
     };
   }
 
@@ -113,15 +113,18 @@ export default class ImageTool {
      * Tool's initial config
      */
     this.config = {
-      endpoints: config.endpoints || '',
+      endpoints: config.endpoints || "",
       additionalRequestData: config.additionalRequestData || {},
       additionalRequestHeaders: config.additionalRequestHeaders || {},
-      field: config.field || 'image',
-      types: config.types || 'image/*',
-      captionPlaceholder: this.api.i18n.t(config.captionPlaceholder || 'Caption'),
-      buttonContent: config.buttonContent || '',
+      field: config.field || "image",
+      types: config.types || "image/*",
+      captionPlaceholder: this.api.i18n.t(
+        config.captionPlaceholder || "Caption"
+      ),
+      buttonContent: config.buttonContent || "",
       uploader: config.uploader || undefined,
       actions: config.actions || [],
+      onLoad: config.onLoad || undefined
     };
 
     /**
@@ -130,7 +133,7 @@ export default class ImageTool {
     this.uploader = new Uploader({
       config: this.config,
       onUpload: (response) => this.onUpload(response),
-      onError: (error) => this.uploadingFailed(error),
+      onError: (error) => this.uploadingFailed(error)
     });
 
     /**
@@ -143,10 +146,10 @@ export default class ImageTool {
         this.uploader.uploadSelectedFile({
           onPreview: (src) => {
             this.ui.showPreloader(src);
-          },
+          }
         });
       },
-      readOnly,
+      readOnly
     });
 
     /**
@@ -155,7 +158,7 @@ export default class ImageTool {
     this.tunes = new Tunes({
       api,
       actions: this.config.actions,
-      onChange: (tuneName) => this.tuneToggled(tuneName),
+      onChange: (tuneName) => this.tuneToggled(tuneName)
     });
 
     /**
@@ -186,7 +189,11 @@ export default class ImageTool {
   save() {
     const caption = this.ui.nodes.caption;
 
+    const img = this.ui.nodes.imageEl;
+
     this._data.caption = caption.innerHTML;
+    this._data.imgWidth = img.width;
+    this._data.imgHeight = img.height;
 
     return this.data;
   }
@@ -223,21 +230,21 @@ export default class ImageTool {
       /**
        * Paste HTML into Editor
        */
-      tags: [ 'img' ],
+      tags: ["img"],
 
       /**
        * Paste URL of image into the Editor
        */
       patterns: {
-        image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png)$/i,
+        image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png)$/i
       },
 
       /**
        * Drag n drop file from into the Editor
        */
       files: {
-        mimeTypes: [ 'image/*' ],
-      },
+        mimeTypes: ["image/*"]
+      }
     };
   }
 
@@ -252,7 +259,7 @@ export default class ImageTool {
    */
   async onPaste(event) {
     switch (event.type) {
-      case 'tag': {
+      case "tag": {
         const image = event.detail.data;
 
         /** Images from PDF */
@@ -267,13 +274,13 @@ export default class ImageTool {
         this.uploadUrl(image.src);
         break;
       }
-      case 'pattern': {
+      case "pattern": {
         const url = event.detail.data;
 
         this.uploadUrl(url);
         break;
       }
-      case 'file': {
+      case "file": {
         const file = event.detail.file;
 
         this.uploadFile(file);
@@ -297,11 +304,14 @@ export default class ImageTool {
   set data(data) {
     this.image = data.file;
 
-    this._data.caption = data.caption || '';
+    this._data.caption = data.caption || "";
     this.ui.fillCaption(this._data.caption);
 
     Tunes.tunes.forEach(({ name: tune }) => {
-      const value = typeof data[tune] !== 'undefined' ? data[tune] === true || data[tune] === 'true' : false;
+      const value =
+        typeof data[tune] !== "undefined"
+          ? data[tune] === true || data[tune] === "true"
+          : false;
 
       this.setTune(tune, value);
     });
@@ -345,7 +355,7 @@ export default class ImageTool {
     if (response.success && response.file) {
       this.image = response.file;
     } else {
-      this.uploadingFailed('incorrect response: ' + JSON.stringify(response));
+      this.uploadingFailed("incorrect response: " + JSON.stringify(response));
     }
   }
 
@@ -357,11 +367,11 @@ export default class ImageTool {
    * @returns {void}
    */
   uploadingFailed(errorText) {
-    console.log('Image Tool: uploading failed because of', errorText);
+    console.log("Image Tool: uploading failed because of", errorText);
 
     this.api.notifier.show({
-      message: this.api.i18n.t('Couldn’t upload image. Please try another.'),
-      style: 'error',
+      message: this.api.i18n.t("Couldn’t upload image. Please try another."),
+      style: "error"
     });
     this.ui.hidePreloader();
   }
@@ -391,16 +401,17 @@ export default class ImageTool {
 
     this.ui.applyTune(tuneName, value);
 
-    if (tuneName === 'stretched') {
+    if (tuneName === "stretched") {
       /**
        * Wait until the API is ready
        */
-      Promise.resolve().then(() => {
-        const blockId = this.api.blocks.getCurrentBlockIndex();
+      Promise.resolve()
+        .then(() => {
+          const blockId = this.api.blocks.getCurrentBlockIndex();
 
-        this.api.blocks.stretchBlock(blockId, value);
-      })
-        .catch(err => {
+          this.api.blocks.stretchBlock(blockId, value);
+        })
+        .catch((err) => {
           console.error(err);
         });
     }
@@ -416,7 +427,7 @@ export default class ImageTool {
     this.uploader.uploadByFile(file, {
       onPreview: (src) => {
         this.ui.showPreloader(src);
-      },
+      }
     });
   }
 

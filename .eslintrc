@@ -1,7 +1,5 @@
 {
-  "extends": [
-    "codex"
-  ],
+  "extends": ["codex"],
   "globals": {
     "fetch": true,
     "ImageConfig": true,
